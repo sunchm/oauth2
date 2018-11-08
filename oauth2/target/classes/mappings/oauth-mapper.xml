@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oauth2.mapper.OAuthDao">
+    
+    <insert id="addRefreshToken" parameterType="Map">
+    	<selectKey keyProperty="count" resultType="int" order="BEFORE">
+			SELECT COUNT(*) from T3_REFRESHTOKEN WHERE APP_ACCOUNT_ID = #{APP_ACCOUNT_ID} AND CLIENT_ID = #{CLIENT_ID}
+		</selectKey>
+		<if test="count > 0">
+			UPDATE T3_REFRESHTOKEN SET 
+			REFRESHTOKEN = #{REFRESHTOKEN},EXPIREIN = #{EXPIREIN}
+			WHERE APP_ACCOUNT_ID = #{APP_ACCOUNT_ID} AND CLIENT_ID = #{CLIENT_ID}
+		</if>
+		<if test="count==0">
+			INSERT INTO T3_REFRESHTOKEN
+			(KEY_ID,
+			 REFRESHTOKEN, 
+			 CLIENT_ID,
+			 APP_ACCOUNT_ID,
+			 EXPIREIN) 
+			VALUES(T3_REFRESHTOKEN_SEQ.NEXTVAL,
+			 #{REFRESHTOKEN},
+			 #{CLIENT_ID},
+			 #{APP_ACCOUNT_ID},
+			 #{EXPIREIN})
+		</if>
+	</insert>
+	
+	<select id="checkRefreshToken" resultType="String">
+        SELECT 
+        EXPIREIN 
+        FROM 
+        T3_REFRESHTOKEN 
+        WHERE REFRESHTOKEN = #{REFRESHTOKEN}
+    </select>
+    
+    <update id="updateRefreshToken" parameterType="Map">
+		UPDATE T3_REFRESHTOKEN SET 
+		REFRESHTOKEN = #{REFRESHTOKEN},EXPIREIN = #{EXPIREIN}
+		WHERE REFRESHTOKEN = #{REFRESHTOKEN_OLD}
+	</update>
+	
+	<select id="findAppAccountIDByRefreshToken" resultType="String">
+         SELECT 
+         APP_ACCOUNT_ID 
+         FROM 
+         T3_REFRESHTOKEN 
+         WHERE REFRESHTOKEN = #{REFRESHTOKEN}
+    </select>
+    
+    <select id="findByUsername" resultType="com.oauth2.entity.User">
+        select salt        	   as "salt",
+	         key_id            as "key_id",
+	         password          as "password"
+	  from t2_app_account
+	  where phone = #{USERNAME}
+	  or account = #{USERNAME}
+    </select>
+    
+    <select id="checkOAuthThridparty" resultType="Map">
+        SELECT 
+	        CLIENT_ID as "client_id",
+	        CLIENT_SECRET as "client_secret",
+	        SCOPE as "scope",
+	        REDIRECT_URI as "redirect_uri"
+        FROM 
+        	T3_OAUTH_THIRDPARTY
+        WHERE CLIENT_ID = #{CLIENT_ID} 
+        <if test = "CLIENT_SECRET!=null and CLIENT_SECRET!=''">
+			AND CLIENT_SECRET = #{CLIENT_SECRET}
+		</if>
+    </select>
+</mapper>

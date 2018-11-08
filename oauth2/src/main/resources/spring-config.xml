@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+          http://www.springframework.org/schema/beans 
+          http://www.springframework.org/schema/beans/spring-beans-4.1.xsd"
+          default-lazy-init="false">
+
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:resources.properties</value>
+				<value>classpath:jwt.properties</value>
+			</list>
+		</property>
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+	</bean>
+
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="driverClassName" value="${jdbc.driverClass}" />
+		<property name="maxActive" value="${jdbc.maxPoolSize}" /> 
+		<property name="maxIdle" value="${jdbc.minPoolSize}" /> 
+	</bean>
+	
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<!--自动匹配Mapper映射文件 -->
+		<property name="mapperLocations" value="classpath:mappings/*" />
+ 		<!--mybatis 实体BEAN所在路径 和查询的表一一对应 -->
+		<property name="typeAliasesPackage" value="com.**.entity" />
+	</bean>
+	
+	<!--通过扫描的模式，扫描目录在com.*.mapper目录下，所有的mapper都继承SqlMapper接口的接口 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+	<!--mybatis dao接口所在包 -->
+		<property name="basePackage" value="com.**.mapper" />
+	</bean>
+
+    <bean id="redis" class="com.oauth2.redis.RedisConnection" init-method="init" scope="singleton">
+		<property name="url" value="${redis.url}"></property>
+		<property name="maxTotal" value="${redis.maxTotal}"></property>
+		<property name="maxIdle" value="${redis.maxIdle}"></property>
+		<property name="maxWaitMillis" value="${redis.maxWaitMillis}"></property>
+		<property name="testOnBorrow" value="${redis.testOnBorrow}"></property>
+		<property name="testOnReturn" value="${redis.testOnReturn}"></property>
+	</bean>
+	
+	<bean id="jwt" class="com.oauth2.entity.Constants">
+		<property name="SECRET" value="${jwt.secret}"></property>
+	    <property name="CODE_EXPIREIN" value="${jwt.code_expirein}"/>
+	    <property name="REFRESH_TOKEN_EXPIREIN" value="${jwt.refresh_token_expirein}"/>
+	    <property name="ACCESS_TOKEN_EXPIREIN" value="${jwt.access_token_expirein}"/>
+	</bean>
+</beans>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <!-- 控制台输出 --> 
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <!-- 日志输出编码 -->
+    <Encoding>UTF-8</Encoding>  
+    <layout class="ch.qos.logback.classic.PatternLayout">  
+       <!--格式化输出：%d表示日期，%-5level：级别从左显示5个字符宽度 %msg：日志消息，%n是换行符-->
+       <pattern> 
+      		%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%F:%line] - %msg%n
+       </pattern>  
+    </layout>  
+  </appender>  
+  <!-- 按照每天生成日志文件 --> 
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">  
+    <Encoding>UTF-8</Encoding>
+    <!-- 指定日志文件的名称 -->
+    <file>${catalina.base}/logs/oauth.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>
+				${catalina.base}/logs/Oauth/oauth-%d{yyyy-MM-dd}-%i.log
+			</FileNamePattern>
+			<!-- 
+			      可选节点，控制保留的归档文件的最大数量，超出数量就删除旧文件。假设设置每天滚动，
+			      且maxHistory是60，则只保存最近60天的文件，删除之前的旧文件。注意，删除旧文件是，
+			      那些为了归档而创建的目录也会被删除。
+			 -->
+			<MaxHistory>60</MaxHistory>
+			<!-- 
+      			当日志文件超过maxFileSize指定的大小是，根据上面提到的%i进行日志文件滚动 注意此处配置SizeBasedTriggeringPolicy是无法实现按文件大小进行滚动的，必须配置timeBasedFileNamingAndTriggeringPolicy
+     		 -->
+      		<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+       	 		<maxFileSize>100MB</maxFileSize>
+      		</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>
+				%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%F:%line] - %msg%n
+			</pattern>
+		</layout>
+  </appender> 
+  <!-- 日志输出级别 -->
+  <root level="INFO">  
+    <appender-ref ref="STDOUT" />  
+	<appender-ref ref="FILE" /> 
+  </root>
+</configuration>
