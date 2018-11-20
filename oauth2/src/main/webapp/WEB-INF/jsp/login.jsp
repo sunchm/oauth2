@@ -66,7 +66,7 @@
     <div class="am-g">
       <h1>授权登录</h1>
       <div style="font-size: 1.8rem">Cloudrive</div>
-      <div>智云互联行车系统</div>
+      <div>智慧行车系统</div>
     </div>
   </div>
   <form method="post" class="am-form am-form-horizontal" action="authorize">
